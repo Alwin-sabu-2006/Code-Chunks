@@ -1,0 +1,86 @@
+.airplane-banner-bar {
+  background: linear-gradient(135deg, #78350f 0%, #92400e 100%);
+  color: #ffffff;
+  border-radius: var(--radius-lg);
+  padding: 12px 18px;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 14px rgba(120, 53, 15, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.airplane-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.plane-icon-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #fef08a;
+}
+
+.plane-text-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.plane-headline {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #fef08a;
+}
+
+.plane-subtext {
+  font-size: 11.5px;
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 720px;
+}
+
+.airplane-banner-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.audit-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  background-color: rgba(0, 0, 0, 0.25);
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  color: #fde68a;
+}
+
+.exit-airplane-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #ffffff;
+  color: #78350f;
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 11.5px;
+  font-weight: 700;
+  transition: all var(--transition-fast);
+}
+
+.exit-airplane-btn:hover {
+  background-color: #fef3c7;
+}

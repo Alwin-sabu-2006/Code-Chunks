@@ -1,0 +1,949 @@
+{
+  "$defs": {
+    "AgentEvent": {
+      "description": "Real-time event emitted by Orchestrator and Agents over WebSocket.",
+      "properties": {
+        "event_id": {
+          "description": "Unique event ID",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "timestamp": {
+          "title": "Timestamp",
+          "type": "string"
+        },
+        "scan_id": {
+          "description": "Scan session ID",
+          "title": "Scan Id",
+          "type": "string"
+        },
+        "agent_name": {
+          "description": "Name of emitting agent (e.g. AnalysisAgent, PqcTestAgent)",
+          "title": "Agent Name",
+          "type": "string"
+        },
+        "event_type": {
+          "$ref": "#/$defs/AgentEventType",
+          "description": "Type of event"
+        },
+        "message": {
+          "description": "Human-readable event message for dashboard feed",
+          "title": "Message",
+          "type": "string"
+        },
+        "data": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Structured payload",
+          "title": "Data"
+        }
+      },
+      "required": [
+        "event_id",
+        "scan_id",
+        "agent_name",
+        "event_type",
+        "message"
+      ],
+      "title": "AgentEvent",
+      "type": "object"
+    },
+    "AgentEventType": {
+      "enum": [
+        "agent_started",
+        "tool_called",
+        "tool_completed",
+        "agent_finished",
+        "decision_made",
+        "error",
+        "log"
+      ],
+      "title": "AgentEventType",
+      "type": "string"
+    },
+    "AlgorithmCategory": {
+      "enum": [
+        "classical",
+        "post_quantum",
+        "hybrid"
+      ],
+      "title": "AlgorithmCategory",
+      "type": "string"
+    },
+    "AnchorRecord": {
+      "description": "On-chain anchoring state for a verified report hash.",
+      "properties": {
+        "report_hash": {
+          "description": "Deterministic SHA-256 or keccak256 hex string with 0x prefix",
+          "title": "Report Hash",
+          "type": "string"
+        },
+        "tx_hash": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Blockchain transaction hash",
+          "title": "Tx Hash"
+        },
+        "submitter": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Ethereum address of submitter",
+          "title": "Submitter"
+        },
+        "timestamp": {
+          "description": "Unix timestamp of anchoring",
+          "title": "Timestamp",
+          "type": "integer"
+        },
+        "block_number": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Block number on target network",
+          "title": "Block Number"
+        },
+        "network": {
+          "default": "anvil",
+          "description": "Target blockchain: anvil, hardhat, sepolia",
+          "title": "Network",
+          "type": "string"
+        },
+        "status": {
+          "default": "unanchored",
+          "enum": [
+            "anchored",
+            "pending",
+            "failed",
+            "unanchored"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "report_hash",
+        "timestamp"
+      ],
+      "title": "AnchorRecord",
+      "type": "object"
+    },
+    "BenchmarkMetrics": {
+      "description": "Timing metrics collected from benchmark runs.",
+      "properties": {
+        "mean_ns": {
+          "description": "Mean execution duration in nanoseconds",
+          "title": "Mean Ns",
+          "type": "number"
+        },
+        "std_dev_ns": {
+          "default": 0.0,
+          "description": "Standard deviation in nanoseconds",
+          "title": "Std Dev Ns",
+          "type": "number"
+        },
+        "iterations": {
+          "default": 100,
+          "description": "Sample count / iterations run",
+          "title": "Iterations",
+          "type": "integer"
+        },
+        "mean_us": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Mean duration in microseconds (convenience)",
+          "title": "Mean Us"
+        }
+      },
+      "required": [
+        "mean_ns"
+      ],
+      "title": "BenchmarkMetrics",
+      "type": "object"
+    },
+    "BenchmarkResult": {
+      "description": "Performance & size benchmarks comparing Classical vs PQC algorithms.",
+      "properties": {
+        "algorithm": {
+          "description": "Name of algorithm (e.g. ECDSA_secp256k1, ML-DSA-65, Falcon-512, SLH-DSA)",
+          "title": "Algorithm",
+          "type": "string"
+        },
+        "category": {
+          "$ref": "#/$defs/AlgorithmCategory",
+          "description": "classical or post_quantum"
+        },
+        "public_key_size_bytes": {
+          "description": "Public key size in bytes",
+          "title": "Public Key Size Bytes",
+          "type": "integer"
+        },
+        "signature_size_bytes": {
+          "description": "Signature size in bytes",
+          "title": "Signature Size Bytes",
+          "type": "integer"
+        },
+        "message_size_bytes": {
+          "default": 32,
+          "description": "Message size used during benchmark",
+          "title": "Message Size Bytes",
+          "type": "integer"
+        },
+        "keygen_metrics": {
+          "$ref": "#/$defs/BenchmarkMetrics",
+          "description": "Key generation latency"
+        },
+        "sign_metrics": {
+          "$ref": "#/$defs/BenchmarkMetrics",
+          "description": "Signing latency"
+        },
+        "verify_metrics": {
+          "$ref": "#/$defs/BenchmarkMetrics",
+          "description": "Verification latency"
+        },
+        "estimated_onchain_gas": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Estimated on-chain gas cost or relative multiplier",
+          "title": "Estimated Onchain Gas"
+        },
+        "storage_overhead_ratio": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Signature size ratio relative to ECDSA (64 bytes)",
+          "title": "Storage Overhead Ratio"
+        }
+      },
+      "required": [
+        "algorithm",
+        "category",
+        "public_key_size_bytes",
+        "signature_size_bytes",
+        "keygen_metrics",
+        "sign_metrics",
+        "verify_metrics"
+      ],
+      "title": "BenchmarkResult",
+      "type": "object"
+    },
+    "CryptoContext": {
+      "enum": [
+        "key_generation",
+        "signing",
+        "verification",
+        "hash_and_sign",
+        "general"
+      ],
+      "title": "CryptoContext",
+      "type": "string"
+    },
+    "DecisionResult": {
+      "description": "Outcome produced by the System One triage & recommendation engine.",
+      "properties": {
+        "ranked_findings": {
+          "description": "Findings ordered by priority/risk",
+          "items": {
+            "$ref": "#/$defs/Finding"
+          },
+          "title": "Ranked Findings",
+          "type": "array"
+        },
+        "overall_risk_score": {
+          "description": "Aggregated risk score (0-100)",
+          "maximum": 100.0,
+          "minimum": 0.0,
+          "title": "Overall Risk Score",
+          "type": "number"
+        },
+        "recommended_algorithm": {
+          "description": "Recommended PQC algorithm (e.g. ML-DSA-65 or Falcon-512)",
+          "title": "Recommended Algorithm",
+          "type": "string"
+        },
+        "recommendation_rationale": {
+          "description": "Justification based on speed, gas, and signature size constraints",
+          "title": "Recommendation Rationale",
+          "type": "string"
+        },
+        "decision_latency_ms": {
+          "description": "Engine execution latency in milliseconds (target < 50ms)",
+          "title": "Decision Latency Ms",
+          "type": "number"
+        },
+        "rules_applied": {
+          "description": "Decision rules triggered during triage",
+          "items": {
+            "type": "string"
+          },
+          "title": "Rules Applied",
+          "type": "array"
+        }
+      },
+      "required": [
+        "overall_risk_score",
+        "recommended_algorithm",
+        "recommendation_rationale",
+        "decision_latency_ms"
+      ],
+      "title": "DecisionResult",
+      "type": "object"
+    },
+    "Finding": {
+      "description": "Represents a vulnerable cryptographic pattern detected in codebase.",
+      "properties": {
+        "id": {
+          "description": "Unique finding identifier (e.g. FIND-001)",
+          "title": "Id",
+          "type": "string"
+        },
+        "file": {
+          "description": "Relative file path where pattern was discovered",
+          "title": "File",
+          "type": "string"
+        },
+        "line": {
+          "description": "Line number of detected code",
+          "title": "Line",
+          "type": "integer"
+        },
+        "algorithm": {
+          "description": "Detected classical algorithm, e.g. secp256k1, ECDSA, ecrecover",
+          "title": "Algorithm",
+          "type": "string"
+        },
+        "context": {
+          "$ref": "#/$defs/CryptoContext",
+          "description": "Context of usage: keygen, signing, verification"
+        },
+        "quantum_risk": {
+          "$ref": "#/$defs/QuantumRiskLevel",
+          "description": "Severity level of vulnerability"
+        },
+        "confidence": {
+          "description": "Detection confidence score between 0.0 and 1.0",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "code_snippet": {
+          "description": "Code snippet containing the vulnerability",
+          "title": "Code Snippet",
+          "type": "string"
+        },
+        "explanation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Plain-language explanation from LLM or deterministic fallback",
+          "title": "Explanation"
+        },
+        "suggested_replacement": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Recommended PQC replacement (e.g. ML-DSA-65, Falcon-512)",
+          "title": "Suggested Replacement"
+        }
+      },
+      "required": [
+        "id",
+        "file",
+        "line",
+        "algorithm",
+        "context",
+        "quantum_risk",
+        "confidence",
+        "code_snippet"
+      ],
+      "title": "Finding",
+      "type": "object"
+    },
+    "McpCallLog": {
+      "description": "Detailed record of an MCP tool invocation for the MCP Call Log Panel.",
+      "properties": {
+        "call_id": {
+          "description": "Call correlation ID",
+          "title": "Call Id",
+          "type": "string"
+        },
+        "timestamp": {
+          "title": "Timestamp",
+          "type": "string"
+        },
+        "scan_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Associated scan ID",
+          "title": "Scan Id"
+        },
+        "server_name": {
+          "description": "MCP server: code-analysis, crypto-test, benchmark, blockchain",
+          "title": "Server Name",
+          "type": "string"
+        },
+        "tool_name": {
+          "description": "Invoked tool name",
+          "title": "Tool Name",
+          "type": "string"
+        },
+        "arguments": {
+          "additionalProperties": true,
+          "description": "Tool input arguments",
+          "title": "Arguments",
+          "type": "object"
+        },
+        "result_summary": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Concise summary of result",
+          "title": "Result Summary"
+        },
+        "duration_ms": {
+          "description": "Execution duration in milliseconds",
+          "title": "Duration Ms",
+          "type": "number"
+        },
+        "status": {
+          "default": "success",
+          "enum": [
+            "success",
+            "error"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "error_message": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Error text if failed",
+          "title": "Error Message"
+        }
+      },
+      "required": [
+        "call_id",
+        "server_name",
+        "tool_name",
+        "duration_ms"
+      ],
+      "title": "McpCallLog",
+      "type": "object"
+    },
+    "QuantumRiskLevel": {
+      "enum": [
+        "CRITICAL",
+        "HIGH",
+        "MEDIUM",
+        "LOW"
+      ],
+      "title": "QuantumRiskLevel",
+      "type": "string"
+    },
+    "Report": {
+      "description": "Full canonical assessment report, signed and anchored on-chain.",
+      "properties": {
+        "report_id": {
+          "description": "UUID or identifier of report",
+          "title": "Report Id",
+          "type": "string"
+        },
+        "title": {
+          "default": "Q-Chain Post-Quantum Migration Assessment",
+          "description": "Report title",
+          "title": "Title",
+          "type": "string"
+        },
+        "timestamp": {
+          "description": "ISO UTC timestamp",
+          "title": "Timestamp",
+          "type": "string"
+        },
+        "target_app_name": {
+          "description": "Name of scanned application",
+          "title": "Target App Name",
+          "type": "string"
+        },
+        "target_app_path": {
+          "description": "Repository or folder analyzed",
+          "title": "Target App Path",
+          "type": "string"
+        },
+        "tool_versions": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Versions of all diagnostic engines and compilers",
+          "title": "Tool Versions",
+          "type": "object"
+        },
+        "findings": {
+          "description": "All detected vulnerabilities",
+          "items": {
+            "$ref": "#/$defs/Finding"
+          },
+          "title": "Findings",
+          "type": "array"
+        },
+        "benchmarks": {
+          "description": "Performance comparisons",
+          "items": {
+            "$ref": "#/$defs/BenchmarkResult"
+          },
+          "title": "Benchmarks",
+          "type": "array"
+        },
+        "verification_matrix": {
+          "description": "Tamper test matrix",
+          "items": {
+            "$ref": "#/$defs/VerificationResult"
+          },
+          "title": "Verification Matrix",
+          "type": "array"
+        },
+        "decision": {
+          "$ref": "#/$defs/DecisionResult",
+          "description": "Triage ranking & recommendation"
+        },
+        "canonical_hash": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "SHA-256 hash of the canonical JSON (computed over sorted payload)",
+          "title": "Canonical Hash"
+        },
+        "anchor_record": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AnchorRecord"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "On-chain anchoring receipt if committed"
+        },
+        "pqc_signature": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional ML-DSA signature of the report hash",
+          "title": "Pqc Signature"
+        },
+        "pqc_public_key": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional ML-DSA public key for report verification",
+          "title": "Pqc Public Key"
+        }
+      },
+      "required": [
+        "report_id",
+        "target_app_name",
+        "target_app_path",
+        "decision"
+      ],
+      "title": "Report",
+      "type": "object"
+    },
+    "ScanStartRequest": {
+      "description": "Payload to trigger a new migration assessment scan.",
+      "properties": {
+        "sample_app_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "ID of bundled sample: token_wallet, voting_dapp, multisig",
+          "title": "Sample App Id"
+        },
+        "folder_path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Local folder path within allowed sandbox",
+          "title": "Folder Path"
+        },
+        "enable_llm_explanations": {
+          "default": true,
+          "description": "Whether to invoke local Ollama LLM for explanations",
+          "title": "Enable Llm Explanations",
+          "type": "boolean"
+        }
+      },
+      "title": "ScanStartRequest",
+      "type": "object"
+    },
+    "ScanStartResponse": {
+      "properties": {
+        "scan_id": {
+          "title": "Scan Id",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/ScanStatus"
+        },
+        "target_app_name": {
+          "title": "Target App Name",
+          "type": "string"
+        },
+        "created_at": {
+          "title": "Created At",
+          "type": "string"
+        },
+        "websocket_url": {
+          "title": "Websocket Url",
+          "type": "string"
+        }
+      },
+      "required": [
+        "scan_id",
+        "status",
+        "target_app_name",
+        "created_at",
+        "websocket_url"
+      ],
+      "title": "ScanStartResponse",
+      "type": "object"
+    },
+    "ScanStatus": {
+      "enum": [
+        "queued",
+        "scanning",
+        "benchmarking",
+        "verifying",
+        "deciding",
+        "reporting",
+        "completed",
+        "failed"
+      ],
+      "title": "ScanStatus",
+      "type": "string"
+    },
+    "ScanStatusResponse": {
+      "properties": {
+        "scan_id": {
+          "title": "Scan Id",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/ScanStatus"
+        },
+        "progress_percentage": {
+          "default": 0,
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Progress Percentage",
+          "type": "integer"
+        },
+        "current_agent": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Current Agent"
+        },
+        "created_at": {
+          "title": "Created At",
+          "type": "string"
+        },
+        "updated_at": {
+          "title": "Updated At",
+          "type": "string"
+        },
+        "error": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Error"
+        }
+      },
+      "required": [
+        "scan_id",
+        "status",
+        "created_at",
+        "updated_at"
+      ],
+      "title": "ScanStatusResponse",
+      "type": "object"
+    },
+    "TamperScenarioResult": {
+      "description": "Single tamper scenario verification outcome.",
+      "properties": {
+        "scenario": {
+          "$ref": "#/$defs/TamperScenarioType",
+          "description": "Tamper test scenario"
+        },
+        "description": {
+          "description": "Description of the test conducted",
+          "title": "Description",
+          "type": "string"
+        },
+        "expected_pass": {
+          "description": "Whether this scenario is expected to pass verification",
+          "title": "Expected Pass",
+          "type": "boolean"
+        },
+        "actual_pass": {
+          "description": "Whether verification succeeded",
+          "title": "Actual Pass",
+          "type": "boolean"
+        },
+        "test_passed": {
+          "description": "True if actual_pass matches expected_pass",
+          "title": "Test Passed",
+          "type": "boolean"
+        },
+        "details": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Diagnostic details",
+          "title": "Details"
+        }
+      },
+      "required": [
+        "scenario",
+        "description",
+        "expected_pass",
+        "actual_pass",
+        "test_passed"
+      ],
+      "title": "TamperScenarioResult",
+      "type": "object"
+    },
+    "TamperScenarioType": {
+      "enum": [
+        "valid_signature",
+        "flipped_bit_message",
+        "flipped_bit_signature",
+        "wrong_public_key"
+      ],
+      "title": "TamperScenarioType",
+      "type": "string"
+    },
+    "VerificationResult": {
+      "description": "Verification and tamper-resistance test outcomes for an algorithm.",
+      "properties": {
+        "algorithm": {
+          "description": "Algorithm name tested",
+          "title": "Algorithm",
+          "type": "string"
+        },
+        "scenarios": {
+          "description": "List of 4 tamper scenarios",
+          "items": {
+            "$ref": "#/$defs/TamperScenarioResult"
+          },
+          "title": "Scenarios",
+          "type": "array"
+        },
+        "tamper_detection_rate": {
+          "default": 1.0,
+          "description": "Detection rate (1.0 = 100%)",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Tamper Detection Rate",
+          "type": "number"
+        },
+        "all_tests_passed": {
+          "default": true,
+          "description": "True if all tamper and valid tests behaved as expected",
+          "title": "All Tests Passed",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "algorithm",
+        "scenarios"
+      ],
+      "title": "VerificationResult",
+      "type": "object"
+    },
+    "VerifyHashResponse": {
+      "properties": {
+        "report_hash": {
+          "title": "Report Hash",
+          "type": "string"
+        },
+        "computed_hash": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Computed Hash"
+        },
+        "match_status": {
+          "enum": [
+            "MATCH",
+            "TAMPERED",
+            "NOT_FOUND"
+          ],
+          "title": "Match Status",
+          "type": "string"
+        },
+        "is_anchored": {
+          "title": "Is Anchored",
+          "type": "boolean"
+        },
+        "record": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AnchorRecord"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "verification_message": {
+          "title": "Verification Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "report_hash",
+        "match_status",
+        "is_anchored",
+        "verification_message"
+      ],
+      "title": "VerifyHashResponse",
+      "type": "object"
+    }
+  },
+  "title": "Q-Chain Unified Schemas"
+}

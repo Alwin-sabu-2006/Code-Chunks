@@ -1,0 +1,435 @@
+{
+  "report_id": "REP-7D351DEE",
+  "title": "Q-Chain Post-Quantum Migration Assessment",
+  "timestamp": "2026-10-10T21:23:27.739040+00:00",
+  "target_app_name": "token_wallet",
+  "target_app_path": "samples/token_wallet",
+  "tool_versions": {
+    "qchain_core": "1.0.0",
+    "liboqs": "0.10.0",
+    "python": "3.13",
+    "fastapi": "0.115.0"
+  },
+  "findings": [
+    {
+      "id": "FIND-D42649D3",
+      "file": "samples/token_wallet/contracts/TokenVault.sol",
+      "line": 34,
+      "algorithm": "ecrecover_secp256k1",
+      "context": "verification",
+      "quantum_risk": "CRITICAL",
+      "confidence": 0.99,
+      "code_snippet": "address signer = ecrecover(messageHash, v, r, s);",
+      "explanation": "Solidity's native `ecrecover` validates secp256k1 signatures, which can be forged by Shor's algorithm.",
+      "suggested_replacement": "ML-DSA-65 (via precompile or off-chain state verification)"
+    },
+    {
+      "id": "FIND-46F129E6",
+      "file": "samples/token_wallet/scripts/deploy.py",
+      "line": 11,
+      "algorithm": "eth_account_ECDSA",
+      "context": "key_generation",
+      "quantum_risk": "CRITICAL",
+      "confidence": 0.98,
+      "code_snippet": "account = Account.from_key(private_key_hex)",
+      "explanation": "Classical elliptic-curve key generation over secp256k1; Shor's algorithm polynomial-time discrete logarithm solving can recover the private key from public keys.",
+      "suggested_replacement": "ML-DSA (FIPS 204), SLH-DSA (FIPS 205), or Falcon-512"
+    },
+    {
+      "id": "FIND-F488A5E8",
+      "file": "samples/token_wallet/scripts/deploy.py",
+      "line": 12,
+      "algorithm": "eth_account_ECDSA",
+      "context": "signing",
+      "quantum_risk": "CRITICAL",
+      "confidence": 0.96,
+      "code_snippet": "msg = encode_defunct(text=payload)",
+      "explanation": "ECDSA signatures are forgeable once the classical private key is recovered via Shor's algorithm.",
+      "suggested_replacement": "ML-DSA-65 (FIPS 204) or Falcon-512"
+    },
+    {
+      "id": "FIND-BE2FE2DA",
+      "file": "samples/token_wallet/src/wallet.ts",
+      "line": 9,
+      "algorithm": "ethers_Wallet_secp256k1",
+      "context": "key_generation",
+      "quantum_risk": "CRITICAL",
+      "confidence": 0.95,
+      "code_snippet": "const wallet = new ethers.Wallet(privateKey);",
+      "explanation": "ethers.Wallet instantiates private keys over the classical secp256k1 elliptic curve.",
+      "suggested_replacement": "PQC Keypair Manager (ML-DSA-65)"
+    },
+    {
+      "id": "FIND-5922C3FD",
+      "file": "samples/token_wallet/src/wallet.ts",
+      "line": 14,
+      "algorithm": "secp256k1_signMessage",
+      "context": "signing",
+      "quantum_risk": "CRITICAL",
+      "confidence": 0.92,
+      "code_snippet": "const signature = await wallet.signMessage(message);",
+      "explanation": "Off-chain message signing using secp256k1 ECDSA private keys.",
+      "suggested_replacement": "ML-DSA-65 / FIPS 204 sign"
+    }
+  ],
+  "benchmarks": [
+    {
+      "algorithm": "ECDSA_secp256k1",
+      "category": "classical",
+      "public_key_size_bytes": 33,
+      "signature_size_bytes": 64,
+      "message_size_bytes": 32,
+      "keygen_metrics": {
+        "mean_ns": 28500.0,
+        "std_dev_ns": 1200.0,
+        "iterations": 100,
+        "mean_us": 28.5
+      },
+      "sign_metrics": {
+        "mean_ns": 34100.0,
+        "std_dev_ns": 1500.0,
+        "iterations": 100,
+        "mean_us": 34.1
+      },
+      "verify_metrics": {
+        "mean_ns": 72000.0,
+        "std_dev_ns": 2400.0,
+        "iterations": 100,
+        "mean_us": 72.0
+      },
+      "estimated_onchain_gas": 3000,
+      "storage_overhead_ratio": 1.0
+    },
+    {
+      "algorithm": "ML-DSA-65 (FIPS 204)",
+      "category": "post_quantum",
+      "public_key_size_bytes": 1952,
+      "signature_size_bytes": 3309,
+      "message_size_bytes": 32,
+      "keygen_metrics": {
+        "mean_ns": 48200.0,
+        "std_dev_ns": 2100.0,
+        "iterations": 100,
+        "mean_us": 48.2
+      },
+      "sign_metrics": {
+        "mean_ns": 124000.0,
+        "std_dev_ns": 4500.0,
+        "iterations": 100,
+        "mean_us": 124.0
+      },
+      "verify_metrics": {
+        "mean_ns": 56300.0,
+        "std_dev_ns": 1800.0,
+        "iterations": 100,
+        "mean_us": 56.3
+      },
+      "estimated_onchain_gas": 12500,
+      "storage_overhead_ratio": 51.7
+    },
+    {
+      "algorithm": "Falcon-512 (FN-DSA)",
+      "category": "post_quantum",
+      "public_key_size_bytes": 897,
+      "signature_size_bytes": 666,
+      "message_size_bytes": 32,
+      "keygen_metrics": {
+        "mean_ns": 8900000.0,
+        "std_dev_ns": 320000.0,
+        "iterations": 100,
+        "mean_us": 8900.0
+      },
+      "sign_metrics": {
+        "mean_ns": 412000.0,
+        "std_dev_ns": 18000.0,
+        "iterations": 100,
+        "mean_us": 412.0
+      },
+      "verify_metrics": {
+        "mean_ns": 81400.0,
+        "std_dev_ns": 3100.0,
+        "iterations": 100,
+        "mean_us": 81.4
+      },
+      "estimated_onchain_gas": 5400,
+      "storage_overhead_ratio": 10.4
+    },
+    {
+      "algorithm": "SLH-DSA-SHAKE-128s (FIPS 205)",
+      "category": "post_quantum",
+      "public_key_size_bytes": 32,
+      "signature_size_bytes": 17088,
+      "message_size_bytes": 32,
+      "keygen_metrics": {
+        "mean_ns": 1150000.0,
+        "std_dev_ns": 45000.0,
+        "iterations": 100,
+        "mean_us": 1150.0
+      },
+      "sign_metrics": {
+        "mean_ns": 156000000.0,
+        "std_dev_ns": 5200000.0,
+        "iterations": 100,
+        "mean_us": 156000.0
+      },
+      "verify_metrics": {
+        "mean_ns": 1820000.0,
+        "std_dev_ns": 62000.0,
+        "iterations": 100,
+        "mean_us": 1820.0
+      },
+      "estimated_onchain_gas": 48000,
+      "storage_overhead_ratio": 267.0
+    }
+  ],
+  "verification_matrix": [
+    {
+      "algorithm": "ECDSA_secp256k1",
+      "scenarios": [
+        {
+          "scenario": "valid_signature",
+          "description": "Standard untampered signature verification",
+          "expected_pass": true,
+          "actual_pass": true,
+          "test_passed": true,
+          "details": "Valid signature passed verification as expected."
+        },
+        {
+          "scenario": "flipped_bit_message",
+          "description": "1-bit alteration in message payload (0x00 -> 0x01)",
+          "expected_pass": false,
+          "actual_pass": false,
+          "test_passed": true,
+          "details": "Bit-flip in message successfully caused verification failure."
+        },
+        {
+          "scenario": "flipped_bit_signature",
+          "description": "1-bit corruption in signature payload",
+          "expected_pass": false,
+          "actual_pass": false,
+          "test_passed": true,
+          "details": "Altered signature bytes rejected."
+        },
+        {
+          "scenario": "wrong_public_key",
+          "description": "Signature verification using an unrelated public key",
+          "expected_pass": false,
+          "actual_pass": false,
+          "test_passed": true,
+          "details": "Unrelated public key failed verification."
+        }
+      ],
+      "tamper_detection_rate": 1.0,
+      "all_tests_passed": true
+    },
+    {
+      "algorithm": "ML-DSA-65 (FIPS 204)",
+      "scenarios": [
+        {
+          "scenario": "valid_signature",
+          "description": "Standard untampered signature verification",
+          "expected_pass": true,
+          "actual_pass": true,
+          "test_passed": true,
+          "details": "Valid signature passed verification as expected."
+        },
+        {
+          "scenario": "flipped_bit_message",
+          "description": "1-bit alteration in message payload (0x00 -> 0x01)",
+          "expected_pass": false,
+          "actual_pass": false,
+          "test_passed": true,
+          "details": "Bit-flip in message successfully caused verification failure."
+        },
+        {
+          "scenario": "flipped_bit_signature",
+          "description": "1-bit corruption in signature payload",
+          "expected_pass": false,
+          "actual_pass": false,
+          "test_passed": true,
+          "details": "Altered signature bytes rejected."
+        },
+        {
+          "scenario": "wrong_public_key",
+          "description": "Signature verification using an unrelated public key",
+          "expected_pass": false,
+          "actual_pass": false,
+          "test_passed": true,
+          "details": "Unrelated public key failed verification."
+        }
+      ],
+      "tamper_detection_rate": 1.0,
+      "all_tests_passed": true
+    },
+    {
+      "algorithm": "Falcon-512 (FN-DSA)",
+      "scenarios": [
+        {
+          "scenario": "valid_signature",
+          "description": "Standard untampered signature verification",
+          "expected_pass": true,
+          "actual_pass": true,
+          "test_passed": true,
+          "details": "Valid signature passed verification as expected."
+        },
+        {
+          "scenario": "flipped_bit_message",
+          "description": "1-bit alteration in message payload (0x00 -> 0x01)",
+          "expected_pass": false,
+          "actual_pass": false,
+          "test_passed": true,
+          "details": "Bit-flip in message successfully caused verification failure."
+        },
+        {
+          "scenario": "flipped_bit_signature",
+          "description": "1-bit corruption in signature payload",
+          "expected_pass": false,
+          "actual_pass": false,
+          "test_passed": true,
+          "details": "Altered signature bytes rejected."
+        },
+        {
+          "scenario": "wrong_public_key",
+          "description": "Signature verification using an unrelated public key",
+          "expected_pass": false,
+          "actual_pass": false,
+          "test_passed": true,
+          "details": "Unrelated public key failed verification."
+        }
+      ],
+      "tamper_detection_rate": 1.0,
+      "all_tests_passed": true
+    },
+    {
+      "algorithm": "SLH-DSA-SHAKE-128s",
+      "scenarios": [
+        {
+          "scenario": "valid_signature",
+          "description": "Standard untampered signature verification",
+          "expected_pass": true,
+          "actual_pass": true,
+          "test_passed": true,
+          "details": "Valid signature passed verification as expected."
+        },
+        {
+          "scenario": "flipped_bit_message",
+          "description": "1-bit alteration in message payload (0x00 -> 0x01)",
+          "expected_pass": false,
+          "actual_pass": false,
+          "test_passed": true,
+          "details": "Bit-flip in message successfully caused verification failure."
+        },
+        {
+          "scenario": "flipped_bit_signature",
+          "description": "1-bit corruption in signature payload",
+          "expected_pass": false,
+          "actual_pass": false,
+          "test_passed": true,
+          "details": "Altered signature bytes rejected."
+        },
+        {
+          "scenario": "wrong_public_key",
+          "description": "Signature verification using an unrelated public key",
+          "expected_pass": false,
+          "actual_pass": false,
+          "test_passed": true,
+          "details": "Unrelated public key failed verification."
+        }
+      ],
+      "tamper_detection_rate": 1.0,
+      "all_tests_passed": true
+    }
+  ],
+  "decision": {
+    "ranked_findings": [
+      {
+        "id": "FIND-D42649D3",
+        "file": "samples/token_wallet/contracts/TokenVault.sol",
+        "line": 34,
+        "algorithm": "ecrecover_secp256k1",
+        "context": "verification",
+        "quantum_risk": "CRITICAL",
+        "confidence": 0.99,
+        "code_snippet": "address signer = ecrecover(messageHash, v, r, s);",
+        "explanation": "Solidity's native `ecrecover` validates secp256k1 signatures, which can be forged by Shor's algorithm.",
+        "suggested_replacement": "ML-DSA-65 (via precompile or off-chain state verification)"
+      },
+      {
+        "id": "FIND-46F129E6",
+        "file": "samples/token_wallet/scripts/deploy.py",
+        "line": 11,
+        "algorithm": "eth_account_ECDSA",
+        "context": "key_generation",
+        "quantum_risk": "CRITICAL",
+        "confidence": 0.98,
+        "code_snippet": "account = Account.from_key(private_key_hex)",
+        "explanation": "Classical elliptic-curve key generation over secp256k1; Shor's algorithm polynomial-time discrete logarithm solving can recover the private key from public keys.",
+        "suggested_replacement": "ML-DSA (FIPS 204), SLH-DSA (FIPS 205), or Falcon-512"
+      },
+      {
+        "id": "FIND-F488A5E8",
+        "file": "samples/token_wallet/scripts/deploy.py",
+        "line": 12,
+        "algorithm": "eth_account_ECDSA",
+        "context": "signing",
+        "quantum_risk": "CRITICAL",
+        "confidence": 0.96,
+        "code_snippet": "msg = encode_defunct(text=payload)",
+        "explanation": "ECDSA signatures are forgeable once the classical private key is recovered via Shor's algorithm.",
+        "suggested_replacement": "ML-DSA-65 (FIPS 204) or Falcon-512"
+      },
+      {
+        "id": "FIND-BE2FE2DA",
+        "file": "samples/token_wallet/src/wallet.ts",
+        "line": 9,
+        "algorithm": "ethers_Wallet_secp256k1",
+        "context": "key_generation",
+        "quantum_risk": "CRITICAL",
+        "confidence": 0.95,
+        "code_snippet": "const wallet = new ethers.Wallet(privateKey);",
+        "explanation": "ethers.Wallet instantiates private keys over the classical secp256k1 elliptic curve.",
+        "suggested_replacement": "PQC Keypair Manager (ML-DSA-65)"
+      },
+      {
+        "id": "FIND-5922C3FD",
+        "file": "samples/token_wallet/src/wallet.ts",
+        "line": 14,
+        "algorithm": "secp256k1_signMessage",
+        "context": "signing",
+        "quantum_risk": "CRITICAL",
+        "confidence": 0.92,
+        "code_snippet": "const signature = await wallet.signMessage(message);",
+        "explanation": "Off-chain message signing using secp256k1 ECDSA private keys.",
+        "suggested_replacement": "ML-DSA-65 / FIPS 204 sign"
+      }
+    ],
+    "overall_risk_score": 100.0,
+    "recommended_algorithm": "ML-DSA-65 (FIPS 204)",
+    "recommendation_rationale": "Detected 5 classical primitives across 3 files (81 lines). Recommended for general production migration: ML-DSA-65 provides ultra-fast verification (56µs) with manageable signature size (3.3KB) and official NIST FIPS 204 primary standardization. For strictly gas-constrained on-chain calldata, consider Falcon-512 (666B signature).",
+    "decision_latency_ms": 0.11,
+    "rules_applied": [
+      "RULE-SCORE-SHOR",
+      "RULE-REC-FIPS204-BALANCED"
+    ],
+    "scan_outcome": "FINDINGS_DETECTED",
+    "files_scanned": 3,
+    "lines_scanned": 81,
+    "languages_detected": [
+      "python",
+      "solidity",
+      "typescript"
+    ]
+  },
+  "scan_outcome": "FINDINGS_DETECTED",
+  "files_scanned": 3,
+  "lines_scanned": 81,
+  "languages_detected": [
+    "python",
+    "solidity",
+    "typescript"
+  ],
+  "canonical_hash": "0xd4207bac2d5f692640ff9000705d880392a2f709b33237b5d41737b4e4524d7a",
+  "anchor_record": null,
+  "pqc_signature": null,
+  "pqc_public_key": null
+}

@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  qchain-crypto-pqc:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.crypto
+    image: qchain/crypto-pqc:latest
+    container_name: qchain-crypto-engine
+    restart: unless-stopped
+    volumes:
+      - ..:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+      - LD_LIBRARY_PATH=/usr/local/lib
+      - PYTHONPATH=/app
+    ports:
+      - "8005:8005"
+    command: python /app/cli.py --interactive

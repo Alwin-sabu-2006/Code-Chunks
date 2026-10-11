@@ -1,0 +1,437 @@
+{
+  "timestamp_utc": "2026-10-10T11:20:11.433278+00:00",
+  "overall_tamper_detection_rate_pct": 100.0,
+  "algorithms_tested": [
+    "ECDSA_secp256k1",
+    "ML-DSA-44",
+    "ML-DSA-65",
+    "ML-DSA-87",
+    "SLH-DSA-SHAKE-128f",
+    "SLH-DSA-SHAKE-128s",
+    "SLH-DSA-SHAKE-256f",
+    "Falcon-512",
+    "Falcon-1024",
+    "Hybrid_ECDSA_ML-DSA-44",
+    "Hybrid_ECDSA_ML-DSA-65"
+  ],
+  "results": [
+    {
+      "algorithm": "ECDSA_secp256k1",
+      "standard_name": "ECDSA (secp256k1)",
+      "category": "Classical (Elliptic Curve)",
+      "nist_security_level": 0,
+      "scenarios": [
+        {
+          "scenario_name": "valid_signature",
+          "expected_valid": true,
+          "actual_valid": true,
+          "passed_test": true,
+          "details": "Legitimate unperturbed message and signature verified against matching public key."
+        },
+        {
+          "scenario_name": "tampered_message",
+          "expected_valid": false,
+          "actual_valid": false,
+          "passed_test": true,
+          "details": "Flipped 1 single bit in payload message; signature verification was rejected."
+        },
+        {
+          "scenario_name": "tampered_signature",
+          "expected_valid": false,
+          "actual_valid": false,
+          "passed_test": true,
+          "details": "Flipped 1 single bit in signature payload; signature verification was rejected."
+        },
+        {
+          "scenario_name": "wrong_public_key",
+          "expected_valid": false,
+          "actual_valid": false,
+          "passed_test": true,
+          "details": "Valid signature evaluated against non-owner public key; verification was rejected."
+        }
+      ],
+      "tamper_detection_rate_pct": 100.0,
+      "all_tests_passed": true
+    },
+    {
+      "algorithm": "ML-DSA-44",
+      "standard_name": "ML-DSA-44 (FIPS 204 / Dilithium2)",
+      "category": "Lattice-based (MLWE / Module-LWE)",
+      "nist_security_level": 2,
+      "scenarios": [
+        {
+          "scenario_name": "valid_signature",
+          "expected_valid": true,
+          "actual_valid": true,
+          "passed_test": true,
+          "details": "Legitimate unperturbed message and signature verified against matching public key."
+        },
+        {
+          "scenario_name": "tampered_message",
+          "expected_valid": false,
+          "actual_valid": false,
+          "passed_test": true,
+          "details": "Flipped 1 single bit in payload message; signature verification was rejected."
+        },
+        {
+          "scenario_name": "tampered_signature",
+          "expected_valid": false,
+          "actual_valid": false,
+          "passed_test": true,
+          "details": "Flipped 1 single bit in signature payload; signature verification was rejected."
+        },
+        {
+          "scenario_name": "wrong_public_key",
+          "expected_valid": false,
+          "actual_valid": false,
+          "passed_test": true,
+          "details": "Valid signature evaluated against non-owner public key; verification was rejected."
+        }
+      ],
+      "tamper_detection_rate_pct": 100.0,
+      "all_tests_passed": true
+    },
+    {
+      "algorithm": "ML-DSA-65",
+      "standard_name": "ML-DSA-65 (FIPS 204 / Dilithium3)",
+      "category": "Lattice-based (MLWE / Module-LWE)",
+      "nist_security_level": 3,
+      "scenarios": [
+        {
+          "scenario_name": "valid_signature",
+          "expected_valid": true,
+          "actual_valid": true,
+          "passed_test": true,
+          "details": "Legitimate unperturbed message and signature verified against matching public key."
+        },
+        {
+          "scenario_name": "tampered_message",
+          "expected_valid": false,
+          "actual_valid": false,
+          "passed_test": true,
+          "details": "Flipped 1 single bit in payload message; signature verification was rejected."
+        },
+        {
+          "scenario_name": "tampered_signature",
+          "expected_valid": false,
+          "actual_valid": false,
+          "passed_test": true,
+          "details": "Flipped 1 single bit in signature payload; signature verification was rejected."
+        },
+        {
+          "scenario_name": "wrong_public_key",
+          "expected_valid": false,
+          "actual_valid": false,
+          "passed_test": true,
+          "details": "Valid signature evaluated against non-owner public key; verification was rejected."
+        }
+      ],
+      "tamper_detection_rate_pct": 100.0,
+      "all_tests_passed": true
+    },
+    {
+      "algorithm": "ML-DSA-87",
+      "standard_name": "ML-DSA-87 (FIPS 204 / Dilithium5)",
+      "category": "Lattice-based (MLWE / Module-LWE)",
+      "nist_security_level": 5,
+      "scenarios": [
+        {
+          "scenario_name": "valid_signature",
+          "expected_valid": true,
+          "actual_valid": true,
+          "passed_test": true,
+          "details": "Legitimate unperturbed message and signature verified against matching public key."
+        },
+        {
+          "scenario_name": "tampered_message",
+          "expected_valid": false,
+          "actual_valid": false,
+          "passed_test": true,
+          "details": "Flipped 1 single bit in payload message; signature verification was rejected."
+        },
+        {
+          "scenario_name": "tampered_signature",
+          "expected_valid": false,
+          "actual_valid": false,
+          "passed_test": true,
+          "details": "Flipped 1 single bit in signature payload; signature verification was rejected."
+        },
+        {
+          "scenario_name": "wrong_public_key",
+          "expected_valid": false,
+          "actual_valid": false,
+          "passed_test": true,
+          "details": "Valid signature evaluated against non-owner public key; verification was rejected."
+        }
+      ],
+      "tamper_detection_rate_pct": 100.0,
+      "all_tests_passed": true
+    },
+    {
+      "algorithm": "SLH-DSA-SHAKE-128f",
+      "standard_name": "SLH-DSA-SHAKE-128f (FIPS 205 / SPHINCS+ 128 Fast)",
+      "category": "Hash-based (Stateless Merkle Trees / FORS + WOTS+)",
+      "nist_security_level": 1,
+      "scenarios": [
+        {
+          "scenario_name": "valid_signature",
+          "expected_valid": true,
+          "actual_valid": true,
+          "passed_test": true,
+          "details": "Legitimate unperturbed message and signature verified against matching public key."
+        },
+        {
+          "scenario_name": "tampered_message",
+          "expected_valid": false,
+          "actual_valid": false,
+          "passed_test": true,
+          "details": "Flipped 1 single bit in payload message; signature verification was rejected."
+        },
+        {
+          "scenario_name": "tampered_signature",
+          "expected_valid": false,
+          "actual_valid": false,
+          "passed_test": true,
+          "details": "Flipped 1 single bit in signature payload; signature verification was rejected."
+        },
+        {
+          "scenario_name": "wrong_public_key",
+          "expected_valid": false,
+          "actual_valid": false,
+          "passed_test": true,
+          "details": "Valid signature evaluated against non-owner public key; verification was rejected."
+        }
+      ],
+      "tamper_detection_rate_pct": 100.0,
+      "all_tests_passed": true
+    },
+    {
+      "algorithm": "SLH-DSA-SHAKE-128s",
+      "standard_name": "SLH-DSA-SHAKE-128s (FIPS 205 / SPHINCS+ 128 Small)",
+      "category": "Hash-based (Stateless Merkle Trees / FORS + WOTS+)",
+      "nist_security_level": 1,
+      "scenarios": [
+        {
+          "scenario_name": "valid_signature",
+          "expected_valid": true,
+          "actual_valid": true,
+          "passed_test": true,
+          "details": "Legitimate unperturbed message and signature verified against matching public key."
+        },
+        {
+          "scenario_name": "tampered_message",
+          "expected_valid": false,
+          "actual_valid": false,
+          "passed_test": true,
+          "details": "Flipped 1 single bit in payload message; signature verification was rejected."
+        },
+        {
+          "scenario_name": "tampered_signature",
+          "expected_valid": false,
+          "actual_valid": false,
+          "passed_test": true,
+          "details": "Flipped 1 single bit in signature payload; signature verification was rejected."
+        },
+        {
+          "scenario_name": "wrong_public_key",
+          "expected_valid": false,
+          "actual_valid": false,
+          "passed_test": true,
+          "details": "Valid signature evaluated against non-owner public key; verification was rejected."
+        }
+      ],
+      "tamper_detection_rate_pct": 100.0,
+      "all_tests_passed": true
+    },
+    {
+      "algorithm": "SLH-DSA-SHAKE-256f",
+      "standard_name": "SLH-DSA-SHAKE-256f (FIPS 205 / SPHINCS+ 256 Fast)",
+      "category": "Hash-based (Stateless Merkle Trees / FORS + WOTS+)",
+      "nist_security_level": 5,
+      "scenarios": [
+        {
+          "scenario_name": "valid_signature",
+          "expected_valid": true,
+          "actual_valid": true,
+          "passed_test": true,
+          "details": "Legitimate unperturbed message and signature verified against matching public key."
+        },
+        {
+          "scenario_name": "tampered_message",
+          "expected_valid": false,
+          "actual_valid": false,
+          "passed_test": true,
+          "details": "Flipped 1 single bit in payload message; signature verification was rejected."
+        },
+        {
+          "scenario_name": "tampered_signature",
+          "expected_valid": false,
+          "actual_valid": false,
+          "passed_test": true,
+          "details": "Flipped 1 single bit in signature payload; signature verification was rejected."
+        },
+        {
+          "scenario_name": "wrong_public_key",
+          "expected_valid": false,
+          "actual_valid": false,
+          "passed_test": true,
+          "details": "Valid signature evaluated against non-owner public key; verification was rejected."
+        }
+      ],
+      "tamper_detection_rate_pct": 100.0,
+      "all_tests_passed": true
+    },
+    {
+      "algorithm": "Falcon-512",
+      "standard_name": "Falcon-512 (FN-DSA / NTRU Lattice)",
+      "category": "Lattice-based (NTRU / Fast-Fourier Orthogonalized)",
+      "nist_security_level": 1,
+      "scenarios": [
+        {
+          "scenario_name": "valid_signature",
+          "expected_valid": true,
+          "actual_valid": true,
+          "passed_test": true,
+          "details": "Legitimate unperturbed message and signature verified against matching public key."
+        },
+        {
+          "scenario_name": "tampered_message",
+          "expected_valid": false,
+          "actual_valid": false,
+          "passed_test": true,
+          "details": "Flipped 1 single bit in payload message; signature verification was rejected."
+        },
+        {
+          "scenario_name": "tampered_signature",
+          "expected_valid": false,
+          "actual_valid": false,
+          "passed_test": true,
+          "details": "Flipped 1 single bit in signature payload; signature verification was rejected."
+        },
+        {
+          "scenario_name": "wrong_public_key",
+          "expected_valid": false,
+          "actual_valid": false,
+          "passed_test": true,
+          "details": "Valid signature evaluated against non-owner public key; verification was rejected."
+        }
+      ],
+      "tamper_detection_rate_pct": 100.0,
+      "all_tests_passed": true
+    },
+    {
+      "algorithm": "Falcon-1024",
+      "standard_name": "Falcon-1024 (FN-DSA / NTRU Lattice)",
+      "category": "Lattice-based (NTRU / Fast-Fourier Orthogonalized)",
+      "nist_security_level": 5,
+      "scenarios": [
+        {
+          "scenario_name": "valid_signature",
+          "expected_valid": true,
+          "actual_valid": true,
+          "passed_test": true,
+          "details": "Legitimate unperturbed message and signature verified against matching public key."
+        },
+        {
+          "scenario_name": "tampered_message",
+          "expected_valid": false,
+          "actual_valid": false,
+          "passed_test": true,
+          "details": "Flipped 1 single bit in payload message; signature verification was rejected."
+        },
+        {
+          "scenario_name": "tampered_signature",
+          "expected_valid": false,
+          "actual_valid": false,
+          "passed_test": true,
+          "details": "Flipped 1 single bit in signature payload; signature verification was rejected."
+        },
+        {
+          "scenario_name": "wrong_public_key",
+          "expected_valid": false,
+          "actual_valid": false,
+          "passed_test": true,
+          "details": "Valid signature evaluated against non-owner public key; verification was rejected."
+        }
+      ],
+      "tamper_detection_rate_pct": 100.0,
+      "all_tests_passed": true
+    },
+    {
+      "algorithm": "Hybrid_ECDSA_ML-DSA-44",
+      "standard_name": "Hybrid (ECDSA secp256k1 + ML-DSA-44)",
+      "category": "Hybrid (Classical + Lattice Dual-Sign)",
+      "nist_security_level": 2,
+      "scenarios": [
+        {
+          "scenario_name": "valid_signature",
+          "expected_valid": true,
+          "actual_valid": true,
+          "passed_test": true,
+          "details": "Legitimate unperturbed message and signature verified against matching public key."
+        },
+        {
+          "scenario_name": "tampered_message",
+          "expected_valid": false,
+          "actual_valid": false,
+          "passed_test": true,
+          "details": "Flipped 1 single bit in payload message; signature verification was rejected."
+        },
+        {
+          "scenario_name": "tampered_signature",
+          "expected_valid": false,
+          "actual_valid": false,
+          "passed_test": true,
+          "details": "Flipped 1 single bit in signature payload; signature verification was rejected."
+        },
+        {
+          "scenario_name": "wrong_public_key",
+          "expected_valid": false,
+          "actual_valid": false,
+          "passed_test": true,
+          "details": "Valid signature evaluated against non-owner public key; verification was rejected."
+        }
+      ],
+      "tamper_detection_rate_pct": 100.0,
+      "all_tests_passed": true
+    },
+    {
+      "algorithm": "Hybrid_ECDSA_ML-DSA-65",
+      "standard_name": "Hybrid (ECDSA secp256k1 + ML-DSA-65)",
+      "category": "Hybrid (Classical + Lattice Dual-Sign)",
+      "nist_security_level": 3,
+      "scenarios": [
+        {
+          "scenario_name": "valid_signature",
+          "expected_valid": true,
+          "actual_valid": true,
+          "passed_test": true,
+          "details": "Legitimate unperturbed message and signature verified against matching public key."
+        },
+        {
+          "scenario_name": "tampered_message",
+          "expected_valid": false,
+          "actual_valid": false,
+          "passed_test": true,
+          "details": "Flipped 1 single bit in payload message; signature verification was rejected."
+        },
+        {
+          "scenario_name": "tampered_signature",
+          "expected_valid": false,
+          "actual_valid": false,
+          "passed_test": true,
+          "details": "Flipped 1 single bit in signature payload; signature verification was rejected."
+        },
+        {
+          "scenario_name": "wrong_public_key",
+          "expected_valid": false,
+          "actual_valid": false,
+          "passed_test": true,
+          "details": "Valid signature evaluated against non-owner public key; verification was rejected."
+        }
+      ],
+      "tamper_detection_rate_pct": 100.0,
+      "all_tests_passed": true
+    }
+  ]
+}

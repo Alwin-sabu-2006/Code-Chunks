@@ -1,0 +1,159 @@
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+@media (max-width: 920px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 540px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.stat-card {
+  border-radius: var(--radius-xl);
+  padding: 18px 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 138px;
+  cursor: pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Dark Card (Total Projects) */
+.stat-card-dark {
+  background-color: var(--primary-dark);
+  color: #ffffff;
+  box-shadow: 0 10px 24px -6px rgba(14, 56, 47, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Light Cards */
+.stat-card-light {
+  background-color: #ffffff;
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-card);
+}
+
+.stat-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.stat-title {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.2px;
+}
+
+.text-white-subtle {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.text-gray-subtle {
+  color: var(--text-secondary);
+}
+
+.stat-arrow-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.arrow-btn-dark {
+  background-color: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+.arrow-btn-dark:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+  transform: scale(1.05);
+}
+
+.arrow-btn-light {
+  background-color: #f8fafc;
+  border: 1px solid var(--border-light);
+  color: var(--text-main);
+}
+
+.arrow-btn-light:hover {
+  background-color: #e2e8f0;
+  transform: scale(1.05);
+}
+
+.stat-value-wrap {
+  margin: 6px 0 8px 0;
+}
+
+.stat-value {
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -1px;
+}
+
+.value-dark {
+  color: #ffffff;
+}
+
+.value-light {
+  color: var(--text-title);
+}
+
+.stat-card-footer {
+  display: flex;
+  align-items: center;
+}
+
+.stat-trend-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.pill-dark {
+  background-color: rgba(255, 255, 255, 0.14);
+  color: #a7f3d0;
+}
+
+.pill-light {
+  background-color: #e6f7ec;
+  color: #166534;
+}
+
+.trend-icon {
+  flex-shrink: 0;
+}
+
+.stat-discuss-text {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 500;
+}

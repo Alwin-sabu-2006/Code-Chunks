@@ -1,0 +1,74 @@
+# ==============================================================================
+# Q-Chain: Official Post-Quantum Cryptography (PQC) Base Dockerfile
+# Prepared by Member 1 (Crypto & PQC Lead)
+# Contains: liboqs (C reference library with all PQC sigs enabled), liboqs-python,
+# Python 3.11, OpenSSL 3, ECDSA, Cryptography, PyCryptodome, Pydantic, and Q-Chain Crypto Core.
+# ==============================================================================
+
+FROM python:3.11-slim-bookworm
+
+LABEL maintainer="Q-Chain Team <crypto@qchain.local>"
+LABEL description="Q-Chain PQC Testing & Benchmarking Container with liboqs"
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+ENV LD_LIBRARY_PATH=/usr/local/lib:${LD_LIBRARY_PATH}
+ENV PYTHONPATH=/app:${PYTHONPATH}
+
+# Install essential build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    cmake \
+    ninja-build \
+    git \
+    libssl-dev \
+    pkg-config \
+    ca-certificates \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Clone and build liboqs (C shared library with full PQC signature mechanisms)
+WORKDIR /tmp/build-liboqs
+RUN git clone --depth 1 --branch main https://github.com/open-quantum-safe/liboqs.git . && \
+    mkdir build && cd build && \
+    cmake -GNinja \
+          -DBUILD_SHARED_LIBS=ON \
+          -DCMAKE_INSTALL_PREFIX=/usr/local \
+          -DOQS_USE_OPENSSL=ON \
+          -DOQS_BUILD_ONLY_LIB=ON \
+          -DCMAKE_BUILD_TYPE=Release \
+          .. && \
+    ninja install && \
+    ldconfig && \
+    cd / && rm -rf /tmp/build-liboqs
+
+# Install Python PQC bindings and cryptographic dependencies
+RUN pip install --no-cache-dir \
+    liboqs-python \
+    cryptography \
+    ecdsa \
+    pycryptodome \
+    pydantic>=2.0 \
+    pytest \
+    tabulate \
+    rich
+
+# Setup app working directory
+WORKDIR /app
+
+# Copy Q-Chain crypto suite
+COPY . /app
+
+# Run validation test to verify PQC algorithms at startup
+RUN python -c "\
+import oqs; \
+sigs = oqs.get_enabled_sig_mechanisms(); \
+print(f'✅ liboqs C library successfully loaded! Enabled signatures: {len(sigs)}'); \
+for algo in ['ML-DSA-44', 'ML-DSA-65', 'ML-DSA-87', 'Falcon-512', 'Falcon-1024']: \
+    print(f'   - {algo}:', 'Available' if algo in sigs or any(algo.lower() in s.lower() for s in sigs) else 'Fallback mode'); \
+"
+
+EXPOSE 8000 8080
+
+ENTRYPOINT ["python", "/app/cli.py"]
+CMD ["--benchmark", "--tamper-matrix", "--gas-estimate"]

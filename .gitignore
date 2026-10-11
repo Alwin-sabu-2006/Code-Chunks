@@ -1,24 +1,17 @@
-# Byte-compiled / optimized / DLL files
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+artifacts/
+cache/
 __pycache__/
-*.py[cod]
-*$py.class
-
-# Local SQLite databases
-*.db
-*.sqlite3
-
-# Environments
-.env
-.venv
-env/
+**/*.pyc
+*.pyo
+*.pyd
+.venv/
 venv/
-ENV/
+.pytest_cache/
+*.log
+.env
 
-# IDE files
-.vscode/
-.idea/
 
-# OS files
-Thumbs.db
-Desktop.ini
-.DS_Store

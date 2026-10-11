@@ -1,0 +1,53 @@
+{
+  "note": "Ground truth for Q-Chain scanner tests. state: findings | clean | pqc_present | unsupported_or_findings. A scan must never return 'clean' or 'quantum-safe' for a file that has findings or that it could not analyze.",
+  "samples": {
+    "VulnVault.sol": {
+      "language": "solidity",
+      "state": "findings",
+      "findings": [
+        {"id": 1, "pattern": "ecrecover", "algorithm": "ECDSA secp256k1", "severity": "high"},
+        {"id": 2, "pattern": "ECDSA.recover (OpenZeppelin)", "algorithm": "ECDSA secp256k1", "severity": "high"},
+        {"id": 3, "pattern": "SECP256K1_N group order constant", "algorithm": "secp256k1", "severity": "medium"}
+      ],
+      "decoys": ["keccak256", "sha256"]
+    },
+    "wallet.js": {
+      "language": "javascript",
+      "state": "findings",
+      "findings": [
+        {"id": 1, "pattern": "new EC('secp256k1')", "algorithm": "ECDSA secp256k1", "severity": "high"},
+        {"id": 2, "pattern": "keyPair.sign / verify", "algorithm": "ECDSA", "severity": "high"},
+        {"id": 3, "pattern": "createECDH('prime256v1')", "algorithm": "ECDH P-256", "severity": "high"},
+        {"id": 4, "pattern": "generateKeyPairSync('rsa', 2048) + crypto.sign", "algorithm": "RSA-2048", "severity": "high"}
+      ],
+      "decoys": ["createHash('sha256')", "aes-256-gcm"]
+    },
+    "clean_control.py": {
+      "language": "python",
+      "state": "clean",
+      "findings": [],
+      "decoys": ["sha3_256", "hmac sha256", "AESGCM"]
+    },
+    "pqc_migrated.py": {
+      "language": "python",
+      "state": "pqc_present",
+      "findings": [],
+      "pqc_detected": ["ML-DSA-65", "ML-KEM-768"]
+    },
+    "unsupported_sample.go": {
+      "language": "go",
+      "state": "unsupported_or_findings",
+      "findings": [
+        {"id": 1, "pattern": "ecdsa.GenerateKey P-256", "algorithm": "ECDSA P-256", "severity": "high"},
+        {"id": 2, "pattern": "ecdsa.Sign", "algorithm": "ECDSA", "severity": "high"}
+      ],
+      "decoys": ["sha256.Sum256"]
+    },
+    "../vulnchain (earlier zip)": {
+      "language": "python",
+      "state": "findings",
+      "findings_count": 5,
+      "decoys": ["sha256 address hash", "sha256 block hash"]
+    }
+  }
+}
