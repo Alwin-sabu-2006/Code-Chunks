@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Smart Contract Scanner — Q-Chain{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">
+        <span>Smart Contract Vulnerability Scanner</span>
+    </h1>
+    <p class="page-desc">
+        Deep static analysis and AST evaluation for Solidity contracts. Detects broken access control on sensitive privileged functions and reentrancy execution ordering vulnerabilities.
+    </p>
+</div>
+
+<!-- Benchmark Quick-Load Pills -->
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">Load Standard Benchmark Contracts</h2>
+    </div>
+    <div class="test-pills">
+        <button type="button" class="pill-btn" onclick="loadContractPreset('VulnerableToken')">
+            Threat 2: VulnerableToken (Unprotected mint)
+        </button>
+        <button type="button" class="pill-btn" onclick="loadContractPreset('SecureToken')">
+            Threat 2: SecureToken (onlyOwner Protected)
+        </button>
+        <button type="button" class="pill-btn" onclick="loadContractPreset('ReadOnlyContract')">
+            Threat 2: ReadOnlyContract (getSupply view)
+        </button>
+        <button type="button" class="pill-btn" onclick="loadContractPreset('VulnerableVault')">
+            Threat 3: VulnerableVault (Reentrancy CEI Violation)
+        </button>
+        <button type="button" class="pill-btn" onclick="loadContractPreset('SecureVault')">
+            Threat 3: SecureVault (Checks-Effects-Interactions)
+        </button>
+        <button type="button" class="pill-btn" onclick="loadContractPreset('ComplexVault')">
+            ComplexVault (ReentrancyGuard + AccessControl)
+        </button>
+    </div>
+</div>
+
+<!-- Source Code Input Card -->
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">Contract Source Code</h2>
+        <span style="font-size: 0.85rem; color: var(--text-dim);">Solidity (.sol)</span>
+    </div>
+
+    <form id="contractAnalysisForm" enctype="multipart/form-data">
+        <div class="grid-2" style="margin-bottom: 20px;">
+            <div class="form-group">
+                <label class="form-label" for="contractFileName">Contract Filename</label>
+                <input type="text" id="contractFileName" name="file_name" class="form-control" value="VulnerableToken.sol">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="solidityFile">Upload .sol File</label>
+                <input type="file" id="solidityFile" name="file" class="form-control" accept=".sol">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="sourceCodeEditor">Solidity Source Code</label>
+            <textarea id="sourceCodeEditor" name="source_code" class="form-control" rows="16" placeholder="// Paste Solidity code here...">// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+// Threat 2: Test Case 1 — Unprotected mint function
+contract VulnerableToken {
+    uint256 public totalSupply;
+
+    function mint(uint256 amount) public {
+        totalSupply += amount;
+    }
+}</textarea>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:24px;">
+            <button type="submit" id="btnAnalyzeContract" class="btn btn-accent">
+                Scan Contract for Vulnerabilities
+            </button>
+            <span style="font-size:0.85rem; color:var(--text-muted);">
+                Hybrid Static Engine: Q-Chain AST/CEI Analyzer + Slither Rulepack
+            </span>
+        </div>
+    </form>
+</div>
+{% endblock %}

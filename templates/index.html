@@ -1,0 +1,302 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard — Q-Chain Blockchain Security Platform{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">
+        <span>Security Analysis Dashboard</span>
+    </h1>
+    <p class="page-desc">
+        Q-Chain provides automated, evidence-based threat detection for EVM transactions and Solidity smart contracts, identifying dangerous allowances, broken access control, and reentrancy vectors before assets are put at risk.
+    </p>
+</div>
+
+<!-- Key Metrics Row -->
+<div class="grid-4" style="margin-bottom: 32px;">
+    <div class="stat-widget">
+        <span class="stat-label">Total Audits Run</span>
+        <span class="stat-value">{{ stats.total_scans }}</span>
+        <span class="stat-sub">Persisted in local audit registry</span>
+    </div>
+    <div class="stat-widget">
+        <span class="stat-label">Contract Code Scans</span>
+        <span class="stat-value">{{ stats.contract_scans }}</span>
+        <span class="stat-sub">Static AST & Slither checks</span>
+    </div>
+    <div class="stat-widget">
+        <span class="stat-label">Transaction Checks</span>
+        <span class="stat-value">{{ stats.tx_scans }}</span>
+        <span class="stat-sub">ERC-20 approvals & calldata</span>
+    </div>
+    <div class="stat-widget">
+        <span class="stat-label">High / Critical Flags</span>
+        <span class="stat-value" style="color: var(--sev-critical);">{{ stats.high_risk_scans }}</span>
+        <span class="stat-sub">Threats identified & mitigated</span>
+    </div>
+</div>
+
+<!-- Three Core Threat Modules Overview -->
+<div class="card" style="margin-bottom: 32px;">
+    <div class="card-header">
+        <h2 class="card-title">Three Core Security Threats Analyzed</h2>
+        <a href="/evaluation" class="btn btn-secondary btn-sm">View 100% Benchmark Matrix &rarr;</a>
+    </div>
+
+    <div class="grid-3">
+        <!-- Threat 1 -->
+        <div style="background: rgba(15, 23, 42, 0.4); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px;">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+                <span class="badge badge-high">Threat 1</span>
+                <h3 style="font-size: 1.05rem; color:#fff;">Dangerous Token Approvals</h3>
+            </div>
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;">
+                Detects unlimited allowances (<code>type(uint256).max</code>) to unverified or blacklisted spender contracts before users sign approval transactions.
+            </p>
+            <div style="margin-bottom: 16px; font-size: 0.8rem; color: var(--text-dim);">
+                &bull; EVM calldata decoding<br>
+                &bull; Spender protocol reputation check<br>
+                &bull; Bounded allowance mitigation
+            </div>
+            <a href="/transaction" class="btn btn-primary btn-sm" style="width: 100%;">Analyze Transaction</a>
+        </div>
+
+        <!-- Threat 2 -->
+        <div style="background: rgba(15, 23, 42, 0.4); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px;">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+                <span class="badge badge-critical">Threat 2</span>
+                <h3 style="font-size: 1.05rem; color:#fff;">Access-Control Vulnerabilities</h3>
+            </div>
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;">
+                Flags unprotected privileged functions (such as token minting, fund withdrawals, and ownership reassignments) lacking recognized authorization guards.
+            </p>
+            <div style="margin-bottom: 16px; font-size: 0.8rem; color: var(--text-dim);">
+                &bull; AST state mutability parsing<br>
+                &bull; Ownable & AccessControl verification<br>
+                &bull; Read-only function exclusion
+            </div>
+            <a href="/contract" class="btn btn-primary btn-sm" style="width: 100%;">Scan Solidity Code</a>
+        </div>
+
+        <!-- Threat 3 -->
+        <div style="background: rgba(15, 23, 42, 0.4); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px;">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+                <span class="badge badge-high">Threat 3</span>
+                <h3 style="font-size: 1.05rem; color:#fff;">Reentrancy Attack Vectors</h3>
+            </div>
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;">
+                Identifies external calls occurring before state variable updates (Checks-Effects-Interactions violations) and simulates dynamic recursive drain exploits.
+            </p>
+            <div style="margin-bottom: 16px; font-size: 0.8rem; color: var(--text-dim);">
+                &bull; Call-versus-storage ordering analysis<br>
+                &bull; ReentrancyGuard mutex verification<br>
+                &bull; Dynamic execution replay engine
+            </div>
+            <a href="/simulation" class="btn btn-accent btn-sm" style="width: 100%;">Launch EVM Simulator</a>
+        </div>
+    </div>
+</div>
+
+<!-- Interactive "What Just Happened?" Explainer for All Three Threats -->
+<div class="card" style="margin-bottom: 32px; border: 1px solid rgba(56, 189, 248, 0.3); background: rgba(15, 23, 42, 0.85);">
+    <div class="card-header">
+        <div>
+            <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-size: 1.2rem;">⚡</span>
+                <h2 class="card-title" style="color: #38bdf8;">Interactive Threat Explainer: "What Just Happened?"</h2>
+            </div>
+            <div style="font-size: 0.85rem; color: var(--text-dim); margin-top: 4px;">
+                Understand how an attacker exploits each vulnerability in plain English, with observable facts vs. risk analysis.
+            </div>
+        </div>
+
+        <div class="test-pills" style="margin-bottom:0;">
+            <button type="button" class="pill-btn active" id="tabThreat1Btn" onclick="switchThreatTab('threat1')">
+                Threat 1: Unlimited Approvals
+            </button>
+            <button type="button" class="pill-btn" id="tabThreat2Btn" onclick="switchThreatTab('threat2')">
+                Threat 2: Broken Access Control
+            </button>
+            <button type="button" class="pill-btn" id="tabThreat3Btn" onclick="switchThreatTab('threat3')">
+                Threat 3: Reentrancy Callbacks
+            </button>
+        </div>
+    </div>
+
+    <!-- Threat 1 Explainer Tab -->
+    <div id="threatTab1" style="display: block;">
+        <div style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 8px;">
+            Scenario: You approve a dApp with an unlimited allowance (2^256 - 1)
+        </div>
+        <p style="font-size: 0.9rem; color: #cbd5e1; margin-bottom: 16px;">
+            <strong style="color: #38bdf8;">The Mechanism:</strong> The transaction executes <code>approve(spender, 115792089237316195423570985008687907853269984665640564039457584007913129639935)</code>. This instructs the token contract's internal mapping <code>allowed[yourAddress][spender]</code> to store maximum uint256.
+        </p>
+
+        <div style="font-size: 0.85rem; font-weight: 700; color: #f87171; text-transform: uppercase; margin-bottom: 10px;">
+            🚨 Attack Timeline: What Happens If The Spender Is Malicious Or Compromised?
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;">
+            <div style="padding: 10px 14px; border-radius: 8px; background: rgba(239, 68, 68, 0.08); border-left: 3px solid #ef4444; font-size: 0.85rem; color: #f1f5f9;">
+                <strong>Step 1 (Legitimate Intent):</strong> You sign the approval in your wallet expecting to trade 100 USDC.
+            </div>
+            <div style="padding: 10px 14px; border-radius: 8px; background: rgba(239, 68, 68, 0.08); border-left: 3px solid #ef4444; font-size: 0.85rem; color: #f1f5f9;">
+                <strong>Step 2 (Dormant Permission):</strong> The allowance stays permanently saved on the blockchain with no expiration date.
+            </div>
+            <div style="padding: 10px 14px; border-radius: 8px; background: rgba(239, 68, 68, 0.08); border-left: 3px solid #ef4444; font-size: 0.85rem; color: #f1f5f9;">
+                <strong>Step 3 (The Exploit):</strong> Months later, the spender router is compromised by an attacker, or was an unverified phishing contract.
+            </div>
+            <div style="padding: 10px 14px; border-radius: 8px; background: rgba(239, 68, 68, 0.08); border-left: 3px solid #ef4444; font-size: 0.85rem; color: #f1f5f9;">
+                <strong>Step 4 (Silent Asset Sweep):</strong> The attacker invokes <code>transferFrom(yourAddress, attackerAddress, balance)</code>. Your entire USDC wallet balance is drained without any new wallet prompt.
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div style="padding: 12px; border-radius: 8px; background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2);">
+                <div style="font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: #60a5fa; margin-bottom: 4px;">Observable Fact vs. Risk</div>
+                <div style="font-size: 0.85rem; color: #cbd5e1;">Fact: Spender allowance is 2^256 - 1. An unlimited approval doesn't prove bad intent, but eliminates all safety margins if the spender is ever breached.</div>
+            </div>
+            <div style="padding: 12px; border-radius: 8px; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25);">
+                <div style="font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: #34d399; margin-bottom: 4px;">Recommended Safe Action</div>
+                <div style="font-size: 0.85rem; color: #cbd5e1;">Always customize the allowance in your wallet to the exact amount needed (e.g. 100 USDC), or revoke permissions after trading.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Threat 2 Explainer Tab -->
+    <div id="threatTab2" style="display: none;">
+        <div style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 8px;">
+            Scenario: Smart contract deploys with an unprotected mint() or withdraw() function
+        </div>
+        <p style="font-size: 0.9rem; color: #cbd5e1; margin-bottom: 16px;">
+            <strong style="color: #38bdf8;">The Mechanism:</strong> The function <code>mint(uint256 amount) public</code> increases <code>totalSupply += amount</code> or modifies balances, but has NO modifier (like <code>onlyOwner</code>) or <code>require(msg.sender == owner)</code> check.
+        </p>
+
+        <div style="font-size: 0.85rem; font-weight: 700; color: #f87171; text-transform: uppercase; margin-bottom: 10px;">
+            🚨 Attack Timeline: What Happens When An Attacker Calls It?
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;">
+            <div style="padding: 10px 14px; border-radius: 8px; background: rgba(239, 68, 68, 0.08); border-left: 3px solid #ef4444; font-size: 0.85rem; color: #f1f5f9;">
+                <strong>Step 1 (Discovery):</strong> Attacker scans newly deployed contracts on block explorers and finds a public <code>mint()</code> function with no restrictions.
+            </div>
+            <div style="padding: 10px 14px; border-radius: 8px; background: rgba(239, 68, 68, 0.08); border-left: 3px solid #ef4444; font-size: 0.85rem; color: #f1f5f9;">
+                <strong>Step 2 (Free Token Creation):</strong> Attacker sends a direct transaction: <code>mint(10,000,000)</code> directly to their address.
+            </div>
+            <div style="padding: 10px 14px; border-radius: 8px; background: rgba(239, 68, 68, 0.08); border-left: 3px solid #ef4444; font-size: 0.85rem; color: #f1f5f9;">
+                <strong>Step 3 (EVM Execution):</strong> The EVM executes the code unconditionally because the developer forgot the authorization gate.
+            </div>
+            <div style="padding: 10px 14px; border-radius: 8px; background: rgba(239, 68, 68, 0.08); border-left: 3px solid #ef4444; font-size: 0.85rem; color: #f1f5f9;">
+                <strong>Step 4 (Market Crash):</strong> Attacker dumps the newly minted tokens onto Uniswap pools, draining all paired ETH and rendering honest holders' tokens worthless.
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div style="padding: 12px; border-radius: 8px; background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2);">
+                <div style="font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: #60a5fa; margin-bottom: 4px;">Observable Fact vs. Risk</div>
+                <div style="font-size: 0.85rem; color: #cbd5e1;">Fact: The function is public and modifies state variables without caller verification. In Solidity, public functions are anyone-callable by default.</div>
+            </div>
+            <div style="padding: 12px; border-radius: 8px; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25);">
+                <div style="font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: #34d399; margin-bottom: 4px;">Recommended Safe Action</div>
+                <div style="font-size: 0.85rem; color: #cbd5e1;">Inherit OpenZeppelin's <code>Ownable</code> or <code>AccessControl</code>: declare <code>function mint(...) public onlyOwner</code> or check role permissions.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Threat 3 Explainer Tab -->
+    <div id="threatTab3" style="display: none;">
+        <div style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 8px;">
+            Scenario: Contract performs external call (msg.sender.call) before updating balance records
+        </div>
+        <p style="font-size: 0.9rem; color: #cbd5e1; margin-bottom: 16px;">
+            <strong style="color: #38bdf8;">The Mechanism:</strong> The contract runs <code>(bool s, ) = msg.sender.call{value: amount}("")</code> BEFORE executing <code>balances[msg.sender] = 0;</code>. This transfers EVM execution control flow to the recipient before updating storage.
+        </p>
+
+        <div style="font-size: 0.85rem; font-weight: 700; color: #f87171; text-transform: uppercase; margin-bottom: 10px;">
+            🚨 Attack Timeline: What Happens During Recursive Callback?
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;">
+            <div style="padding: 10px 14px; border-radius: 8px; background: rgba(239, 68, 68, 0.08); border-left: 3px solid #ef4444; font-size: 0.85rem; color: #f1f5f9;">
+                <strong>Step 1 (Setup):</strong> Attacker contract deposits 1 ETH into the vault. Vault records <code>balances[attacker] = 1 ETH</code>.
+            </div>
+            <div style="padding: 10px 14px; border-radius: 8px; background: rgba(239, 68, 68, 0.08); border-left: 3px solid #ef4444; font-size: 0.85rem; color: #f1f5f9;">
+                <strong>Step 2 (Withdrawal Request):</strong> Attacker calls <code>withdraw()</code>. Vault checks <code>balances[attacker] == 1 ETH</code> (passes) and executes <code>msg.sender.call{value: 1 ETH}</code>.
+            </div>
+            <div style="padding: 10px 14px; border-radius: 8px; background: rgba(239, 68, 68, 0.08); border-left: 3px solid #ef4444; font-size: 0.85rem; color: #f1f5f9;">
+                <strong>Step 3 (The Interception):</strong> Attacker's contract has a <code>receive() external payable</code> fallback function that immediately calls <code>vault.withdraw()</code> AGAIN before the original call finishes!
+            </div>
+            <div style="padding: 10px 14px; border-radius: 8px; background: rgba(239, 68, 68, 0.08); border-left: 3px solid #ef4444; font-size: 0.85rem; color: #f1f5f9;">
+                <strong>Step 4 (Outdated State Exploit):</strong> On re-entry, the vault checks <code>balances[attacker]</code>. Because the line <code>balances[msg.sender] = 0</code> hasn't executed yet, the vault still reads 1 ETH and sends another 1 ETH! Repeated until the entire contract is drained.
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div style="padding: 12px; border-radius: 8px; background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2);">
+                <div style="font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: #60a5fa; margin-bottom: 4px;">Observable Fact vs. Risk</div>
+                <div style="font-size: 0.85rem; color: #cbd5e1;">Fact: The external value transfer precedes the storage write in the control flow graph. Reentrancy occurs when code trusts un-updated state across execution boundaries.</div>
+            </div>
+            <div style="padding: 12px; border-radius: 8px; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25);">
+                <div style="font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: #34d399; margin-bottom: 4px;">Recommended Safe Action</div>
+                <div style="font-size: 0.85rem; color: #cbd5e1;">Apply Checks-Effects-Interactions (zero balance BEFORE calling), or use OpenZeppelin's <code>ReentrancyGuard</code> with <code>nonReentrant</code> modifier.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Scans Table -->
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">Recent Security Audits</h2>
+        <a href="/history" class="btn btn-secondary btn-sm">View Full History</a>
+    </div>
+
+    {% if recent_scans %}
+    <div class="table-responsive">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>Audit ID</th>
+                    <th>Scan Target</th>
+                    <th>Type</th>
+                    <th>Risk Level</th>
+                    <th>Risk Score</th>
+                    <th>Findings</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for scan in recent_scans %}
+                <tr>
+                    <td style="font-family: var(--font-mono); font-weight:600; color: var(--accent-blue);">{{ scan.scan_id }}</td>
+                    <td style="font-weight: 500;">{{ scan.target_name[:35] }}{% if scan.target_name|length > 35 %}...{% endif %}</td>
+                    <td>
+                        {% if scan.scan_type == 'TRANSACTION' %}
+                        <span class="badge badge-info">Transaction</span>
+                        {% else %}
+                        <span class="badge badge-low">Contract</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge badge-{{ scan.risk_level|lower }}">{{ scan.risk_level }}</span>
+                    </td>
+                    <td>
+                        <strong style="color: #fff;">{{ scan.risk_score }}/100</strong>
+                    </td>
+                    <td>{{ scan.findings_count }} item(s)</td>
+                    <td>
+                        <a href="/report/{{ scan.scan_id }}" class="btn btn-secondary btn-sm">Report &rarr;</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 40px 0; color: var(--text-muted);">
+        <p style="margin-bottom: 16px;">No security scans recorded yet.</p>
+        <div style="display:flex; justify-content:center; gap: 12px;">
+            <a href="/transaction" class="btn btn-primary btn-sm">Test Transaction Analyzer</a>
+            <a href="/contract" class="btn btn-secondary btn-sm">Scan First Contract</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
